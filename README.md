@@ -14,7 +14,14 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 
 
-        <!--=============== REMIXICONS ===============-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Page title</title>
+</head>
+<body>
+           <!--=============== REMIXICONS ===============-->
         <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
         <!--=============== BATTERY ===============-->
@@ -320,3 +327,5 @@ function initBattery(){
     })      
 }
 </script>
+</body>
+</html>
