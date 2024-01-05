@@ -1,0 +1,40 @@
+/*<![CDATA[*/
+@font-face{font-family:'Google Sans Text';font-style:normal;font-weight:500;font-display:swap;src:local('Google Sans Text'),local('Google-Sans-Text'),url(https://fonts.gstatic.com/s/googlesanstext/v16/5aUu9-KzpRiLCAt4Unrc-xIKmCU5qEp2iw.woff2) format('woff2')} @font-face{font-family:'Google Sans Text';font-style:normal;font-weight:900;font-display:swap;src:local('Google Sans Text'),local('Google-Sans-Text'),url(https://fonts.gstatic.com/s/googlesanstext/v16/5aUp9-KzpRiLCAt4Unrc-xIKmCU5oPFTnmhjtg.woff2) format('woff2')} @font-face{font-family:'Google Sans Mono';font-style:normal;font-weight:400;font-display:swap;src:local('Google Sans Mono'),local('Google-Sans-Mono'),url(https://fonts.gstatic.com/s/googlesansmono/v4/P5sUzYWFYtnZ_Cg-t0Uq_rfivrdYH4RE8-pZ5gQ1abT53wVQGrk.woff2) format('woff2')}
+/*]]>*/
+
+.entry-title,*{font-family:Google Sans Text;} 
+ 
+ 
+   .icns{
+       text-align: center;
+   } 
+    
+    .icns a{
+        font-size: 25px; padding: 10px;
+  text-decoration: none;
+  color: white;
+  position: relative;
+  top: -10px;
+    }
+   
+   
+    .poc{width: 120px;  border: 2px solid #ffb200;    border-radius: 50%;
+display: block;
+  margin: 5px auto;
+ }
+ .pilo{
+     padding: 10px; text-align: center;
+color: black;
+ }
+ .tup{
+ 
+     margin-top: -20px;
+  margin-bottom: -20px;
+ border-radius: 10px;
+ border: 1px solid white;
+border: 1px solid black;
+padding-top: -50px;
+
+margin: auto;
+align-items: center;
+justify-content: center; }
