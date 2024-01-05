@@ -2,7 +2,7 @@
 <img align='right' src="https://media.giphy.com/media/M9gbBd9nbDrOTu1Mqx/giphy.gif" width="110" border-radius="10px">
 <p><b>Web Designer At <a href="http://www.dktechnozone.in">Dk technozone</a><img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="40px"> 
 </b></p>
-<hr>
+
 <br />
 <h2 align="center">You can reach me at :alien:</h2>
 
@@ -40,9 +40,5 @@ you can contact me iff you have any problem on your website and apps i am also a
 <h4 align="center">Profile stats :musical_keyboard:</h4>
 
 <p align="center"><img src="https://github-readme-stats.vercel.app/api?username=dhanjeerider&show_icons=true&theme=synthwave" alt="AnhellO :: Profile Stats" /></p>
-
-
-
-<link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.2.1/css/all.css" />
 
  
