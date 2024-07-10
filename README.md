@@ -31,7 +31,7 @@ you can contact me iff you have any problem on your website and apps i am also a
 
 <h4 align="center">Visitor's count :eyes:</h4>
 
-<p align="center"><img src="https://profile-counter.glitch.me/{AnhellO}/count.svg" alt="AnhellO :: Visitor's Count" /></p>
+<p align="center"><img src="https://profile-counter.glitch.me/{dhanjeerider}/count.svg" alt="dhanjeerider :: Visitor's Count" /></p>
 
 <h4 align="center">Top langs :tongue:</h4>
 
