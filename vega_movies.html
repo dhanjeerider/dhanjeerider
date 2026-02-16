@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Vega Movies</title>
+</head>
+<body>
+    <div id="postsGrid" class="posts-grid"></div>
+    <script>
+        function renderPosts(posts, append = false) {
+            if (!append) postsGrid.innerHTML = '';
+            posts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'poster-card';
+                card.onclick = () => navigateTo(post.url);
+                card.innerHTML = `
+                    <div class="poster-inner">
+                        <div class="poster-image">
+                            <img src="${post.featuredImage}" alt="${post.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x300/1e293b/94a3b8?text=Image+Pending'">
+                        </div>
+                        <div class="poster-info">
+                            <p class="poster-title">${post.title}</p>
+                        </div>
+                    </div>`;
+                postsGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
