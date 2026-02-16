@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ dynamicTitle }}</title>
+    <meta name="description" content="{{ dynamicDescription }}">
+    <link rel="canonical" href="{{ canonicalUrl }}">
+    <meta property="og:title" content="{{ dynamicTitle }}">
+    <meta property="og:description" content="{{ dynamicDescription }}">
+    <meta property="og:image" content="{{ imageUrl }}">
+    <meta property="og:url" content="{{ canonicalUrl }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ dynamicTitle }}">
+    <meta name="twitter:description" content="{{ dynamicDescription }}">
+    <meta name="twitter:image" content="{{ imageUrl }}">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Your Site Name",
+            "url": "{{ baseUrl }}",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "{{ baseUrl }}/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to {{ siteName }}</h1>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "item": {
+                        "@id": "{{ baseUrl }}",
+                        "name": "Home"
+                    }
+                }
+                // Additional breadcrumb items
+            ]
+        }
+    </script>
+    <footer>
+        <script>
+            function generateSitemap() {
+                const urls = [
+                    '{{ baseUrl }}/page1',
+                    '{{ baseUrl }}/page2',
+                    '{{ baseUrl }}/page3' // Dynamically generate from your posts
+                ];
+                // Output your sitemap.xml
+            }
+        </script>
+    </footer>
+</body>
+</html>
