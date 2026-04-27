@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Post Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: Arial, sans-serif; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .col-8 { flex: 1; min-width: 300px; }
+        .col-4 { flex: 0 0 30%; min-width: 250px; }
+        
+        input, textarea, button { font-family: Arial, sans-serif; }
+        input[type="text"], input[type="file"], textarea {
+            width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #333; 
+            background: #1a1a1a; color: #fff; border-radius: 5px;
+        }
+        
+        h2, h3, h4 { margin: 15px 0 10px; color: #cbfc01; }
+        
+        .jumbotron { background: #1a1a1a; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .jumbotron input { width: 100%; }
+        
+        #movies {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .movie-card {
+            background: #1a1a1a; border: 2px solid #333; border-radius: 5px; 
+            overflow: hidden; cursor: pointer; transition: all 0.3s;
+        }
+        
+        .movie-card:hover { 
+            border-color: #cbfc01; transform: scale(1.05); 
+        }
+        
+        .movie-card img {
+            width: 100%; height: 200px; object-fit: cover; display: block;
+        }
+        
+        .movie-card-info {
+            padding: 10px; font-size: 12px;
+        }
+        
+        .movie-card-title {
+            font-weight: bold; color: #cbfc01; margin-bottom: 5px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        
+        .movie-card-rating { color: #aaa; }
+        
+        #movie { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); display: none; z-index: 1000; 
+            overflow: auto; padding: 20px;
+        }
+        
+        #movie.show { display: flex; align-items: center; justify-content: center; }
+        
+        .modal-content {
+            background: #1a1a1a; border-radius: 10px; padding: 20px; 
+            max-width: 600px; position: relative; max-height: 90vh; overflow: auto;
+        }
+        
+        .close-btn {
+            position: absolute; top: 10px; right: 10px; background: #c9170f; 
+            color: #fff; border: none; padding: 10px 15px; border-radius: 5px; 
+            cursor: pointer; font-size: 16px;
+        }
+        
+        .button-group {
+            display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0;
+        }
+        
+        .btn-option {
+            flex: 0 1 calc(33% - 5px); padding: 8px; border: 1px solid #333; 
+            background: #1a1a1a; color: #fff; border-radius: 5px; cursor: pointer; 
+            font-size: 12px; transition: all 0.3s;
+        }
+        
+        .btn-option:hover { background: #333; }
+        .btn-option.active { background: #cbfc01; color: #000; border-color: #cbfc01; }
+        
+        .sidebar {
+            background: #1a1a1a; padding: 15px; border-radius: 5px; 
+            border: 1px solid #333; position: sticky; top: 20px; height: fit-content;
+        }
+        
+        .gen-btn, .copy-btn, .preview-btn {
+            width: 100%; padding: 12px; margin: 10px 0; background: #cbfc01; 
+            color: #000; border: none; border-radius: 5px; cursor: pointer; 
+            font-weight: bold; font-size: 14px; transition: all 0.3s;
+        }
+        
+        .gen-btn:hover, .copy-btn:hover, .preview-btn:hover {
+            background: #b3e000; transform: translateY(-2px);
+        }
+        
+        .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        #postcode-preview {
+            background: #0a0a0a; border: 1px solid #333; padding: 15px; 
+            border-radius: 5px; margin: 15px 0; max-height: 400px; overflow: auto;
+            display: none;
+        }
+        
+        #postcode-preview.show { display: block; }
+        
+        .preview-html {
+            background: #1a1a1a; border: 1px solid #cbfc01; padding: 15px; 
+            border-radius: 5px; margin: 15px 0;
+        }
+        
+        #snackbar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #cbfc01; color: #000; padding: 15px 25px; border-radius: 5px;
+            display: none; z-index: 2000; font-weight: bold;
+        }
+        
+        .hidden { display: none !important; }
+        .ldr1 { text-align: center; color: #cbfc01; }
+        .error { color: #ff6b6b; }
+        
+        .movie-details { font-size: 14px; margin: 10px 0; }
+        .movie-details strong { color: #cbfc01; }
+        
+        @media (max-width: 768px) {
+            .row { flex-direction: column; }
+            .col-4 { flex: 1; }
+            #movies { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+            .btn-option { flex: 0 1 calc(50% - 5px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <!-- MAIN CONTENT -->
+        <div class="col-8">
+            <div class="jumbotron">
+                <h3 style="margin-top: 0;">🎬 Search For Any Movie</h3>
+                <input type="text" id="searchText" placeholder="Search For Any Movie...">
+                <small style="color: #aaa;">Type to search instantly</small>
+            </div>
+
+            <div id="movies"></div>
+            
+            <!-- MOVIE DETAILS MODAL -->
+            <div id="movie">
+                <div class="modal-content">
+                    <button class="close-btn">✕</button>
+                    <div id="movie-details-content"></div>
+                </div>
+            </div>
+
+            <!-- CODE PREVIEW -->
+            <div id="postcode-preview">
+                <h3>📝 Post Preview</h3>
+                <div class="preview-html" id="preview-content"></div>
+                <button class="copy-btn" style="margin-top: 10px;">📋 Copy to Clipboard</button>
+            </div>
+
+            <textarea id="postcode" style="display:none;"></textarea>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="col-4">
+            <div class="sidebar">
+                <h3 style="margin-top: 0;">⚙️ Settings</h3>
+
+                <h4>Website Name</h4>
+                <input type="text" class="site" placeholder="movie-post-generator.blogspot.com">
+
+                <h4>Movie File Size</h4>
+                <input type="text" class="siz" placeholder="e.g., 500MB, 2GB">
+
+                <h4>Download Link</h4>
+                <input type="text" class="dlink" placeholder="https://example.com/download">
+
+                <h4>Movie Tags</h4>
+                <textarea id="tg" placeholder="movie, download, hd..." rows="3"></textarea>
+
+                <h4>Episodes (for Series)</h4>
+                <input type="text" class="ep" placeholder="e.g., 1-13">
+
+                <h4>Movie Quality</h4>
+                <div class="button-group" id="quality-group">
+                    <button class="btn-option" data-value="HDRip">HDRip</button>
+                    <button class="btn-option" data-value="BluRay">BluRay</button>
+                    <button class="btn-option" data-value="BRRip">BRRip</button>
+                    <button class="btn-option" data-value="WebRip">WebRip</button>
+                    <button class="btn-option" data-value="Web-DL">Web-DL</button>
+                    <button class="btn-option" data-value="PreDvd">PreDvd</button>
+                    <button class="btn-option" data-value="SCam">SCam</button>
+                </div>
+
+                <h4>Resolution</h4>
+                <div class="button-group" id="resolution-group">
+                    <button class="btn-option" data-value="480p">480p</button>
+                    <button class="btn-option" data-value="720p">720p</button>
+                    <button class="btn-option" data-value="1080p">1080p</button>
+                    <button class="btn-option" data-value="2K">2K</button>
+                    <button class="btn-option" data-value="4K">4K</button>
+                    <button class="btn-option" data-value="8K">8K</button>
+                </div>
+
+                <h4>Category</h4>
+                <div class="button-group" id="category-group">
+                    <button class="btn-option" data-value="Hollywood English">Hollywood English</button>
+                    <button class="btn-option" data-value="Hollywood Hindi">Hollywood Hindi</button>
+                    <button class="btn-option" data-value="Punjabi">Punjabi</button>
+                    <button class="btn-option" data-value="South Hindi">South Hindi</button>
+                    <button class="btn-option" data-value="Bollywood">Bollywood</button>
+                    <button class="btn-option" data-value="Dual Audio">Dual Audio</button>
+                    <button class="btn-option" data-value="Web Series">Web Series</button>
+                </div>
+
+                <button class="gen-btn">🎯 Generate Post Code</button>
+                <button class="copy-btn hidden">📋 Copy Code</button>
+                <button class="preview-btn hidden">👁️ Show Preview</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="snackbar"></div>
+
+<script>
+// ================= CONFIG =================
+const API_KEY = '1cf50e6248dc270629e802686245c2c8';
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+
+// ================= STATE =================
+let selectedMovie = null;
+let selectedQuality = '';
+let selectedResolution = '';
+let selectedCategory = '';
+
+// ================= SAFE SELECT =================
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+const setHTML = (sel, html) => { const el = $(sel); if(el) el.innerHTML = html; };
+
+// ================= ELEMENTS =================
+const moviesEl = $("#movies");
+const movieEl = $("#movie");
+const searchInput = $("#searchText");
+const genBtn = $(".gen-btn");
+const copyBtn = $(".copy-btn");
+const previewBtn = $(".preview-btn");
+const postcode = $("#postcode");
+const previewBox = $("#postcode-preview");
+const previewContent = $("#preview-content");
+const snackbar = $("#snackbar");
+
+// ================= LOCAL STORAGE =================
+["site", "siz", "dlink"].forEach(cls => {
+    const el = document.querySelector("." + cls);
+    if(!el) return;
+    el.value = localStorage.getItem(cls) || "";
+    el.addEventListener("input", () => localStorage.setItem(cls, el.value));
+});
+
+// ================= FETCH MOVIES =================
+async function fetchMovies(url) {
+    setHTML("#movies", '<div class="ldr1">Loading movies...</div>');
+    try {
+        const res = await fetch(`${BASE_URL}${url}&api_key=${API_KEY}`);
+        const data = await res.json();
+        if(data.results) showMovies(data.results);
+    } catch(err) {
+        console.error(err);
+        setHTML("#movies", '<p class="error">Error loading movies</p>');
+    }
+}
+
+// ================= SHOW MOVIES =================
+function showMovies(items) {
+    if(!moviesEl) return;
+    moviesEl.innerHTML = "";
+
+    items.forEach(item => {
+        if(!item.poster_path) return;
+
+        const title = item.title || item.name;
+        const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+
+        const card = document.createElement("div");
+        card.className = "movie-card";
+        card.innerHTML = `
+            <img src="${IMG_URL}${item.poster_path}" alt="${title}">
+            <div class="movie-card-info">
+                <div class="movie-card-title">${title}</div>
+                <div class="movie-card-rating">⭐ ${rating}</div>
+            </div>
+        `;
+
+        card.addEventListener("click", () => {
+            selectedMovie = item;
+            getMovieDetails(item.id, item.media_type || "movie");
+        });
+
+        moviesEl.appendChild(card);
+    });
+}
+
+// ================= GET MOVIE DETAILS =================
+async function getMovieDetails(id, type) {
+    setHTML("#movie-details-content", '<div class="ldr1">Loading details...</div>');
+    movieEl.classList.add("show");
+
+    try {
+        const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&append_to_response=videos,credits`);
+        const data = await res.json();
+
+        const trailer = data.videos?.results?.find(v => v.type === "Trailer");
+        const cast = data.credits?.cast?.slice(0, 5)?.map(c => c.name)?.join(", ") || "N/A";
+        const title = data.title || data.name;
+        const releaseDate = data.release_date || data.first_air_date || "N/A";
+
+        selectedMovie = { ...selectedMovie, ...data };
+
+        setHTML("#movie-details-content", `
+            <h2>${title}</h2>
+            <img src="${IMG_URL}${data.poster_path}" style="width:100%; border-radius:5px; margin:15px 0;">
+            
+            <div class="movie-details">
+                <p><strong>Rating:</strong> ⭐ ${data.vote_average}</p>
+                <p><strong>Release Date:</strong> ${releaseDate}</p>
+                <p><strong>Genre:</strong> ${data.genres?.map(g => g.name).join(", ") || "N/A"}</p>
+                <p><strong>Cast:</strong> ${cast}</p>
+            </div>
+
+            <h4>Overview</h4>
+            <p style="font-size: 14px; line-height: 1.6;">${data.overview}</p>
+
+            ${trailer ? `
+                <h4 style="margin-top: 20px;">Trailer</h4>
+                <iframe width="100%" height="300" src="https://www.youtube.com/embed/${trailer.key}" 
+                    allowfullscreen style="border-radius:5px;"></iframe>
+            ` : ''}
+        `);
+
+    } catch(err) {
+        console.error(err);
+        setHTML("#movie-details-content", '<p class="error">Error loading details</p>');
+    }
+}
+
+// ================= CLOSE MODAL =================
+const closeMovieModal = () => {
+    movieEl.classList.remove("show");
+    setHTML("#movie-details-content", "");
+};
+
+document.addEventListener("click", (e) => {
+    if(e.target === movieEl) closeMovieModal();
+});
+
+$(".close-btn").addEventListener("click", closeMovieModal);
+
+// ================= BUTTON GROUP HANDLERS =================
+const setupButtonGroup = (groupId, stateVar) => {
+    document.querySelectorAll(`#${groupId} .btn-option`).forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(`#${groupId} .btn-option`).forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            if(groupId === "quality-group") selectedQuality = this.dataset.value;
+            if(groupId === "resolution-group") selectedResolution = this.dataset.value;
+            if(groupId === "category-group") selectedCategory = this.dataset.value;
+        });
+    });
+};
+
+setupButtonGroup("quality-group", "selectedQuality");
+setupButtonGroup("resolution-group", "selectedResolution");
+setupButtonGroup("category-group", "selectedCategory");
+
+// ================= GENERATE CODE =================
+genBtn.addEventListener("click", () => {
+    if(!selectedMovie) {
+        showSnackbar("❌ Please select a movie first!");
+        return;
+    }
+
+    const title = selectedMovie.title || selectedMovie.name || "Movie";
+    const site = $(".site").value || "Your Site";
+    const size = $(".siz").value || "N/A";
+    const link = $(".dlink").value || "#";
+    const tags = $("#tg").value || "";
+    const episodes = $(".ep").value || "";
+    const img = selectedMovie.poster_path ? IMG_URL + selectedMovie.poster_path : "";
+    const rating = selectedMovie.vote_average ? selectedMovie.vote_average.toFixed(1) : "N/A";
+
+    const htmlCode = `
+<div style="background: #f5f5f5; border: 2px solid #333; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="color: #000; margin-top: 0;">${title}</h2>
+    
+    ${img ? `<img src="${img}" alt="${title}" style="width: 100%; height: auto; border-radius: 8px; margin: 15px 0;">` : ''}
+    
+    <div style="background: #fff; padding: 15px; border-radius: 5px; margin: 15px 0; color: #000;">
+        <p><strong>Website:</strong> ${site}</p>
+        <p><strong>File Size:</strong> ${size}</p>
+        <p><strong>Rating:</strong> ⭐ ${rating}</p>
+        ${selectedQuality ? `<p><strong>Quality:</strong> ${selectedQuality}</p>` : ''}
+        ${selectedResolution ? `<p><strong>Resolution:</strong> ${selectedResolution}</p>` : ''}
+        ${selectedCategory ? `<p><strong>Category:</strong> ${selectedCategory}</p>` : ''}
+        ${episodes ? `<p><strong>Episodes:</strong> ${episodes}</p>` : ''}
+    </div>
+    
+    ${tags ? `<p style="color: #666; font-size: 12px;"><strong>Tags:</strong> ${tags}</p>` : ''}
+    
+    <a href="${link}" target="_blank" style="display: inline-block; background: #cbfc01; color: #000; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">📥 Download Now</a>
+</div>
+`;
+
+    postcode.value = htmlCode;
+    previewContent.innerHTML = htmlCode;
+    previewBox.classList.add("show");
+    copyBtn.classList.remove("hidden");
+    previewBtn.classList.remove("hidden");
+    closeMovieModal();
+    showSnackbar("✅ Code Generated!");
+});
+
+// ================= COPY CODE =================
+copyBtn.addEventListener("click", () => {
+    if(postcode.value) {
+        postcode.select();
+        document.execCommand("copy");
+        showSnackbar("✅ Code Copied to Clipboard!");
+    }
+});
+
+// ================= PREVIEW =================
+previewBtn.addEventListener("click", () => {
+    previewBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showSnackbar("👁️ Preview is shown below");
+});
+
+// ================= SNACKBAR =================
+const showSnackbar = (message) => {
+    snackbar.textContent = message;
+    snackbar.style.display = "block";
+    setTimeout(() => {
+        snackbar.style.display = "none";
+    }, 3000);
+};
+
+// ================= LIVE SEARCH =================
+let searchTimer;
+searchInput.addEventListener("keyup", () => {
+    clearTimeout(searchTimer);
+    const query = searchInput.value.trim();
+    
+    searchTimer = setTimeout(() => {
+        if(query.length > 2) {
+            fetchMovies(`/search/multi?query=${encodeURIComponent(query)}`);
+        } else {
+            fetchMovies(`/trending/all/day`);
+        }
+    }, 500);
+});
+
+// ================= INIT =================
+window.addEventListener("DOMContentLoaded", () => {
+    fetchMovies(`/trending/all/day`);
+});
+</script>
+
+</body>
+</html>
